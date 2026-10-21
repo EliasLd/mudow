@@ -33,6 +33,12 @@ fi
 while [[ $# -gt 0 ]]; do
     case $1 in
         -p|--path)
+            if [[ $# -lt 2 || -z "$2" || "$2" == -* ]]; then
+                echo "Error: --path requires a directory argument"
+                echo ""
+                help
+                exit 1
+            fi
             DOWNLOAD_DIR="$2"
             shift 2
             ;;
@@ -44,7 +50,19 @@ while [[ $# -gt 0 ]]; do
             help
             exit 0
             ;;
+        -*)
+            echo "Error: Unknown option: $1"
+            echo ""
+            help
+            exit 1
+            ;;
         *)
+            if [[ -n "$URL" ]]; then
+                echo "Error: Only one URL is supported"
+                echo ""
+                help
+                exit 1
+            fi
             URL="$1"
             shift
             ;;
@@ -61,7 +79,19 @@ fi
 
 # Set download directory
 DOWNLOAD_DIR="${DOWNLOAD_DIR:-$DEFAULT_DIR}"
-mkdir -p "$DOWNLOAD_DIR"
+
+# Expand a leading tilde (paths are not shell-evaluated by the rofi launcher)
+case "$DOWNLOAD_DIR" in
+    "~")     DOWNLOAD_DIR="$HOME" ;;
+    "~/"*)   DOWNLOAD_DIR="$HOME/${DOWNLOAD_DIR#\~/}" ;;
+esac
+
+if ! mkdir -p "$DOWNLOAD_DIR"; then
+    echo "Error: Cannot create download directory: $DOWNLOAD_DIR"
+    echo ""
+    help
+    exit 1
+fi
 
 # Define full path for the archive file inside the download directory
 ARCHIVE_PATH="$DOWNLOAD_DIR/$ARCHIVE_FILE"

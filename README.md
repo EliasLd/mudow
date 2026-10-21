@@ -2,7 +2,7 @@
 
 A simple and modern set of tools to download YouTube videos or playlists as mp3 — from your terminal or with a practical Rofi menu.
 
-![Usage demo](./assets/demo.gif) <!-- Replace with your real GIF path -->
+![Usage demo](./assets/demo.gif)
 
 ---
 
@@ -23,7 +23,9 @@ mudow --playlist https://youtube.com/playlist?list=xxxxxxx
 mudow --path ~/Music/myfolder https://youtube.com/watch?v=xxxxxxx
 ```
 
-*Requires: [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) installed on your system.*
+Downloads land in `~/Music/<YYYY-MM-DD>-music` by default — a new folder per day. Each folder keeps an `archive.txt` download log, so re-running a previously downloaded URL into the same folder won't fetch it again.
+
+*Requires: [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) installed on your system (which itself needs `ffmpeg` to extract and convert audio).*
 
 ---
 
@@ -34,7 +36,7 @@ mudow --path ~/Music/myfolder https://youtube.com/watch?v=xxxxxxx
 - Uses a clean One Dark theme and supports direct clipboard paste and user interaction.
 - Easily tweak appearance, keybinds, colors through the included Rofi style configs.
 
-*Requires: [`rofi`](https://github.com/davatorium/rofi) installed on your system (along with `yt-dlp`).*
+*Requires: [`rofi`](https://github.com/davatorium/rofi) installed on your system (along with `mudow`), `libnotify` (`notify-send`) for notifications, and a [Nerd Font](https://www.nerdfonts.com/) for the menu icons.*
 
 ---
 
@@ -55,7 +57,7 @@ Simply run the installation script
 
 > [!NOTE]
 > Maybe you don't use rofi or Arch (**btw**) and you just want to install mudow to use it in your terminal, and it's fine!
-You can specify `--mudow-only`.
+You can specify `--mudow-only` to skip the Rofi config, or `--rofi-only` to install the Rofi menu without the `mudow` global command.
 
 Depending on what option is used, the script will:
 - Install `mudow` globally (`/usr/bin/mudow`)
@@ -68,14 +70,19 @@ Depending on what option is used, the script will:
 ## Requirements
 
 - [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) (for actual downloading and conversion)
+- `ffmpeg` (needed by `yt-dlp` to extract and convert audio, and embed thumbnails)
 - [`rofi`](https://github.com/davatorium/rofi) (only needed for the graphical launcher)
+- `libnotify` (`notify-send`, only needed for the graphical launcher notifications)
 
 If on Arch, both are available with pacman and AUR:
 
 ```bash
-pacman -S yt-dlp rofi
+pacman -S yt-dlp ffmpeg rofi libnotify
 # Or with AUR, yay for example
-yay -S yt-dlp rofi
+yay -S yt-dlp ffmpeg rofi libnotify
+
+# Nerd Font, used for the rofi menu icons (JetBrains Mono recommended)
+pacman -S ttf-jetbrains-mono-nerd
 ```
 
 ---

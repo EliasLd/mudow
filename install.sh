@@ -29,7 +29,9 @@ while [[ $# -gt 0 ]]; do
             exit 0
             ;;
         *)
-            shift
+            echo -e "${RED}Error: Unknown option: $1${NC}"
+            echo -e "Usage: $0 [--mudow-only|-m] [--rofi-only|-r]"
+            exit 1
             ;;
     esac
 done
@@ -60,9 +62,9 @@ install_script() {
 copy_rofi_config() {
     mkdir -p "$ROFI_CONFIG_DIR"
     for f in "$ROFI_SRC_DIR"/*; do
-        # recurse for colors dir
+        # -rT merges the content instead of nesting if the destination dir exists
         if [ -d "$f" ]; then
-            cp -r "$f" "$ROFI_CONFIG_DIR/"
+            cp -rT "$f" "$ROFI_CONFIG_DIR/$(basename "$f")"
         elif [ -f "$f" ]; then
             cp "$f" "$ROFI_CONFIG_DIR/"
         fi

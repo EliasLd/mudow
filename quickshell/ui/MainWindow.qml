@@ -33,6 +33,19 @@ PanelWindow {
         bottom: true
     }
 
+    // Single source of truth for the mudow command: the on-screen
+    // preview and the spawned process read this array.
+    readonly property var commandArgs: {
+        const dest = destCard.text.trim();
+        const args = [Paths.mudowPath];
+        if (dest !== "")
+            args.push("-p", dest);
+        if (typeSelector.playlist)
+            args.push("-P");
+        args.push(urlCard.text.trim());
+        return args;
+    }
+
     // Dismissal: layer surfaces receive no close events, so the
     // visible->hidden transition drives the instance shutdown below.
     function requestClose() {
@@ -155,6 +168,29 @@ PanelWindow {
                 color: Theme.tokens.danger
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSmall
+            }
+
+            UrlCard {
+                id: urlCard
+
+                Layout.fillWidth: true
+            }
+
+            TypeSelector {
+                id: typeSelector
+
+                Layout.fillWidth: true
+            }
+
+            DestinationCard {
+                id: destCard
+
+                Layout.fillWidth: true
+            }
+
+            CommandPreview {
+                Layout.fillWidth: true
+                args: root.commandArgs
             }
         }
     }

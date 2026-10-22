@@ -46,10 +46,46 @@ PanelWindow {
         return args;
     }
 
-    // Dismissal: layer surfaces receive no close events, so the
-    // visible->hidden transition drives the instance shutdown below.
+    // Fire-and-forget download: while it runs the window stays hidden and
+    // the instance outlives it, reporting through notifications.
+    readonly property bool hasUrl: urlCard.text.trim() !== ""
+    // Explicit state flag. Do NOT derive this from mudowProc.running:
+    // bindings over a Process property set from script go stale on 0.3.2,
+    // and a stale false here would terminate the instance right after
+    // submit.
+    property bool busy: false
+    property string lastLine: ""
+
+    function stripAnsi(line) {
+        return line.replace(/\x1B\[[0-9;]*m/g, "");
+    }
+
+    // Same notification copy as rofi/launch.sh; delivered through the
+    // desktop's notification daemon.
+    function notify(icon, message) {
+        Quickshell.execDetached([Paths.notifySendPath, "-a", "mudow", "-i", icon, "YouTube Download", message]);
+    }
+
+    // Submit: persist the destination, notify, spawn, hide. The busy flag
+    // flips before the hide so the hide handler sees a running download
+    // and lets it outlive the window.
+    function submit() {
+        if (root.busy || !root.hasUrl || !Paths.mudowOk)
+            return;
+        root.busy = true;
+        Preferences.setLastDest(destCard.text.trim());
+        root.lastLine = "";
+        mudowProc.command = root.commandArgs.slice();
+        notify("download", "Starting download...");
+        mudowProc.running = true;
+        root.visible = false; // fire-and-forget: gone instantly
+    }
+
+    // Dismissal: only meaningful while the form is open (a download that
+    // already started survives the window — see the hide handler).
     function requestClose() {
-        root.visible = false;
+        if (!root.busy)
+            root.visible = false;
     }
 
     // Transient visibility flaps fire while the config loads (and on
@@ -66,14 +102,19 @@ PanelWindow {
             root.appActive = true;
             // Dismissed during the settle window? That was a real close
             // the hide handler skipped — shut down instead of leaving an
-            // invisible instance blocking future -n launches.
-            if (!root.visible)
+            // invisible instance blocking future -n launches. A download
+            // already running (submitted within the window) stays alive.
+            if (!root.visible && !root.busy)
                 quitTimer.restart();
         }
     }
 
-    onVisibleChanged: visible => {
-        if (!visible && root.appActive)
+    onVisibleChanged: {
+        // Use root.visible: this signal carries no argument on 0.3.2 (a
+        // handler parameter reads undefined). busy hides are the
+        // submitted window going away: the download outlives the form
+        // and reports via notifications.
+        if (!root.visible && root.appActive && !root.busy)
             quitTimer.restart();
     }
 
@@ -90,6 +131,28 @@ PanelWindow {
         id: shutdown
 
         command: ["kill", "-TERM", String(Quickshell.processId)]
+    }
+
+    // mudow runs to completion on its own: on success parse the target
+    // directory for the finish notification, on failure mirror rofi's
+    // copy. Either way the instance then terminates itself.
+    Process {
+        id: mudowProc
+
+        stdout: SplitParser {
+            onRead: data => root.lastLine = root.stripAnsi(data)
+        }
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode === 0) {
+                const found = root.lastLine.match(/Downloaded to (.*)/);
+                const dir = found ? found[1].trim() : "";
+                notify("dialog-positive", dir !== "" ? "Download finished!\n" + dir : "Download finished!");
+            } else {
+                notify("dialog-error", "Failed!");
+            }
+            root.busy = false;
+            quitTimer.restart();
+        }
     }
 
     Shortcut {
@@ -174,6 +237,7 @@ PanelWindow {
                 id: urlCard
 
                 Layout.fillWidth: true
+                onSubmitted: root.submit()
             }
 
             TypeSelector {
@@ -191,6 +255,12 @@ PanelWindow {
             CommandPreview {
                 Layout.fillWidth: true
                 args: root.commandArgs
+            }
+
+            DownloadButton {
+                Layout.fillWidth: true
+                allowed: root.hasUrl && Paths.mudowOk
+                onClicked: root.submit()
             }
         }
     }

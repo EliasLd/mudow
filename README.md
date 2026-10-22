@@ -1,6 +1,6 @@
 # Rofi YouTube Music Downloader
 
-A simple and modern set of tools to download YouTube videos or playlists as mp3 — from your terminal or with a practical Rofi menu.
+A simple and modern set of tools to download YouTube videos or playlists as mp3 — from your terminal, with a Rofi menu, or with a quickshell desktop overlay.
 
 ![Usage demo](./assets/demo.gif)
 
@@ -40,10 +40,22 @@ Downloads land in `~/Music/<YYYY-MM-DD>-music` by default — a new folder per d
 
 ---
 
-## Why two tools?
+### `mudow-gui` (Quickshell GUI Music Downloader)
+
+- **A single-window desktop overlay built with [Quickshell](https://quickshell.outfoxxed.me)**, driving the same `mudow` command from a compact centered dialog with a One dark/light theme.
+- URL field with direct clipboard paste, a video/playlist segmented selector, an optional destination override, and a live preview of the exact command that will run.
+- **Fire-and-forget downloads**: submitting hides the window immediately and the download keeps running in the background — results arrive as desktop notifications, with the same copies as the Rofi menu.
+- Small snappy animations (spring pop on open, cross-fade when toggling between the dark and light palettes), and preferences (theme, last destination) persist between sessions.
+
+*Requires: [`quickshell`](https://quickshell.outfoxxed.me) 0.3+ (a Wayland compositor implementing `wlr-layer-shell`, e.g. Hyprland/sway), `mudow`, and a [Nerd Font](https://www.nerdfonts.com/) for the icons.*
+
+---
+
+## Why three tools?
 
 - `mudow` is **universal**: works everywhere bash works, no GUI required.
 - `rofi-music-dl` brings the same features in a beautiful, integrated visual menu that's ideal for desktop environments and workflow automation.
+- `mudow-gui` is the same flow as a **desktop overlay dialog** — one compact window, dark/light themes, fire-and-forget notifications, zero terminal interaction.
 
 ---
 
@@ -57,13 +69,15 @@ Simply run the installation script
 
 > [!NOTE]
 > Maybe you don't use rofi or Arch (**btw**) and you just want to install mudow to use it in your terminal, and it's fine!
-You can specify `--mudow-only` to skip the Rofi config, or `--rofi-only` to install the Rofi menu without the `mudow` global command.
+You can specify `--mudow-only` to install just the CLI, or pick what you want with `--rofi-only`, `--quickshell-only`, `--no-rofi` and `--no-quickshell`.
 
-Depending on what option is used, the script will:
+Depending on what options are used, the script will:
 - Install `mudow` globally (`/usr/bin/mudow`)
 - Copy the Rofi menu and its themes to `~/.config/rofi/rofi-music-dl`
-- Let you launch the Rofi interface with `~/.config/rofi/rofi-music-dl/launch.sh`  
-  (optionally, bind it to a key combo in your WM!)
+- Copy the quickshell GUI config to `~/.config/quickshell/rofi-music-dl`
+- Install the GUI launcher globally (`/usr/bin/mudow-gui`)
+- Let you launch the Rofi interface with `~/.config/rofi/rofi-music-dl/launch.sh`, or the GUI with `mudow-gui`  
+  (optionally, bind either to a key combo in your WM!)
 
 ---
 
@@ -71,17 +85,18 @@ Depending on what option is used, the script will:
 
 - [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) (for actual downloading and conversion)
 - `ffmpeg` (needed by `yt-dlp` to extract and convert audio, and embed thumbnails)
-- [`rofi`](https://github.com/davatorium/rofi) (only needed for the graphical launcher)
-- `libnotify` (`notify-send`, only needed for the graphical launcher notifications)
+- [`rofi`](https://github.com/davatorium/rofi) (only needed for the Rofi launcher)
+- [`quickshell`](https://quickshell.outfoxxed.me) (only needed for the quickshell GUI)
+- `libnotify` (`notify-send`, needed for the launchers' notifications)
 
-If on Arch, both are available with pacman and AUR:
+If on Arch, these are available with pacman and AUR:
 
 ```bash
-pacman -S yt-dlp ffmpeg rofi libnotify
+pacman -S yt-dlp ffmpeg rofi libnotify quickshell
 # Or with AUR, yay for example
-yay -S yt-dlp ffmpeg rofi libnotify
+yay -S yt-dlp ffmpeg rofi libnotify quickshell
 
-# Nerd Font, used for the rofi menu icons (JetBrains Mono recommended)
+# Nerd Font, used for the icons in both launchers (JetBrains Mono recommended)
 pacman -S ttf-jetbrains-mono-nerd
 ```
 
@@ -92,3 +107,5 @@ pacman -S ttf-jetbrains-mono-nerd
 The menu style and launcher are fully hackable!  
 Change colors, rounding, position, font, etc. in `~/.config/rofi/rofi-music-dl/style.rasi`  
 Edit `launch.sh` to fit your workflow.
+
+The quickshell GUI is equally hackable: the dark/light palette, typography, shape and motion tokens all live in `~/.config/quickshell/rofi-music-dl/config/Theme.qml`, and each part of the window is a small, editable QML file under `~/.config/quickshell/rofi-music-dl/ui/`.

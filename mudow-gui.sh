@@ -5,7 +5,7 @@
 # launch while one is in flight is refused by the instance guard — that
 # refusal is surfaced as a notification instead of failing silently.
 
-CONFIG_DIR="${MUDOW_GUI_CONFIG:-$HOME/.config/quickshell/rofi-music-dl}"
+CONFIG_DIR="${MUDOW_GUI_CONFIG:-$HOME/.config/quickshell/mudow}"
 
 if ! command -v qs >/dev/null 2>&1 && ! command -v quickshell >/dev/null 2>&1; then
     echo "mudow-gui: quickshell (qs) is not installed" >&2

@@ -97,6 +97,16 @@ copy_config_tree() {
     echo -e "${GREEN}[OK]${NC} Copied config to $dest_dir"
 }
 
+# --- One-time carry-over of state.json from the previous config dir ---
+migrate_state() {
+    local legacy_state="$HOME/.config/quickshell/rofi-music-dl/state.json"
+    local dest_state="$QUICKSHELL_CONFIG_DIR/state.json"
+    if [ ! -f "$dest_state" ] && [ -f "$legacy_state" ]; then
+        cp "$legacy_state" "$dest_state"
+        echo -e "${GREEN}[OK]${NC} Kept state.json from the previous config location"
+    fi
+}
+
 # --- Installation process ---
 STEPS=()
 $INSTALL_MUDOW && STEPS+=(mudow)
@@ -121,6 +131,7 @@ if $INSTALL_QUICKSHELL; then
     STEP=$((STEP + 1))
     echo -e "\n${BLUE}[$STEP/$TOTAL]${NC} Installing quickshell GUI config..."
     copy_config_tree "$QUICKSHELL_SRC_DIR" "$QUICKSHELL_CONFIG_DIR"
+    migrate_state
     install_script "$REPO_DIR/mudow-gui.sh" "/usr/bin/mudow-gui"
 fi
 

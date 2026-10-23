@@ -57,8 +57,16 @@ ColumnLayout {
         Item {
             id: videoSegment
 
+            activeFocusOnTab: true
             width: track.width / 2
             height: parent.height
+
+            // Keyboard-activatable: Return, keypad Enter or Space select;
+            // Right hops to the playlist segment.
+            Keys.onReturnPressed: root.playlist = false
+            Keys.onEnterPressed: root.playlist = false
+            Keys.onSpacePressed: root.playlist = false
+            Keys.onRightPressed: playlistSegment.forceActiveFocus()
 
             MouseArea {
                 id: videoMouse
@@ -66,7 +74,10 @@ ColumnLayout {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onClicked: root.playlist = false
+                onClicked: {
+                    root.playlist = false;
+                    videoSegment.forceActiveFocus();
+                }
             }
 
             Row {
@@ -96,15 +107,41 @@ ColumnLayout {
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
+
+            // Focus ring: primary on the unselected half, onPrimary so it
+            // stays visible against the filled selected half.
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: 2
+                radius: Theme.radiusSmall
+                color: "transparent"
+                border.width: 2
+                border.color: videoSegment.activeFocus
+                    ? (root.playlist ? Theme.tokens.onPrimary : Theme.tokens.primary)
+                    : "transparent"
+                Behavior on border.color {
+                    ColorAnimation {
+                        duration: Theme.durationFast
+                        easing.type: Theme.easingCubic
+                    }
+                }
+            }
         }
 
         // Playlist segment
         Item {
             id: playlistSegment
 
+            activeFocusOnTab: true
             x: track.width / 2
             width: track.width / 2
             height: parent.height
+
+            // Keyboard-activatable; Left hops back to the video segment.
+            Keys.onReturnPressed: root.playlist = true
+            Keys.onEnterPressed: root.playlist = true
+            Keys.onSpacePressed: root.playlist = true
+            Keys.onLeftPressed: videoSegment.forceActiveFocus()
 
             MouseArea {
                 id: playlistMouse
@@ -112,7 +149,10 @@ ColumnLayout {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onClicked: root.playlist = true
+                onClicked: {
+                    root.playlist = true;
+                    playlistSegment.forceActiveFocus();
+                }
             }
 
             Row {
@@ -140,6 +180,25 @@ ColumnLayout {
                     font.pixelSize: Theme.fontSize
                     font.weight: root.playlist ? 600 : 500
                     anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+
+            // Focus ring: primary on the unselected half, onPrimary so it
+            // stays visible against the filled selected half.
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: 2
+                radius: Theme.radiusSmall
+                color: "transparent"
+                border.width: 2
+                border.color: playlistSegment.activeFocus
+                    ? (root.playlist ? Theme.tokens.onPrimary : Theme.tokens.primary)
+                    : "transparent"
+                Behavior on border.color {
+                    ColorAnimation {
+                        duration: Theme.durationFast
+                        easing.type: Theme.easingCubic
+                    }
                 }
             }
         }

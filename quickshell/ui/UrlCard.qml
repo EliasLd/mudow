@@ -6,12 +6,19 @@ import Quickshell.Io
 import qs.config
 
 // SOURCE group: section label + URL field with paste and clear actions.
-// Enter in the field submits the download.
+// Enter in the field submits the download; an empty submit shakes the
+// card as visible feedback.
 ColumnLayout {
     id: root
 
     property alias text: field.text
     signal submitted()
+
+    // Visible refusal: a submit attempt with nothing to download points
+    // at the source field instead of doing nothing.
+    function shake() {
+        shakeAnimation.restart();
+    }
 
     opacity: enabled ? 1 : 0.45
     Behavior on opacity {
@@ -44,6 +51,39 @@ ColumnLayout {
             border.color: field.activeFocus ? Theme.tokens.primary : Theme.tokens.border
             Behavior on border.color {
                 ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easingCubic }
+            }
+
+            // Shake rail: the transform offset never touches the x that
+            // RowLayout owns.
+            transform: Translate { id: shakeOffset; x: 0 }
+
+            SequentialAnimation {
+                id: shakeAnimation
+
+                NumberAnimation {
+                    target: shakeOffset
+                    property: "x"
+                    from: 0
+                    to: -6
+                    duration: 40
+                    easing.type: Theme.easingCubic
+                }
+                NumberAnimation {
+                    target: shakeOffset
+                    property: "x"
+                    from: -6
+                    to: 6
+                    duration: 80
+                    easing.type: Theme.easingCubic
+                }
+                NumberAnimation {
+                    target: shakeOffset
+                    property: "x"
+                    from: 6
+                    to: 0
+                    duration: 40
+                    easing.type: Theme.easingCubic
+                }
             }
 
             TextField {

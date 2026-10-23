@@ -68,9 +68,15 @@ PanelWindow {
 
     // Submit: persist the destination, notify, spawn, hide. The busy flag
     // flips before the hide so the hide handler sees a running download
-    // and lets it outlive the window.
+    // and lets it outlive the window. Every trigger funnels here — the
+    // Download button (mouse or keyboard) and Enter in either field. An
+    // empty URL shakes the source field instead of failing silently.
     function submit() {
-        if (root.busy || !root.hasUrl || !Paths.mudowOk)
+        if (!root.hasUrl) {
+            urlCard.shake();
+            return;
+        }
+        if (root.busy || !Paths.mudowOk)
             return;
         root.busy = true;
         Preferences.setLastDest(destCard.text.trim());
@@ -250,6 +256,7 @@ PanelWindow {
                 id: destCard
 
                 Layout.fillWidth: true
+                onSubmitted: root.submit()
             }
 
             CommandPreview {

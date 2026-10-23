@@ -37,9 +37,17 @@ Rectangle {
 
         Item { Layout.fillWidth: true }
 
-        // Theme toggle: shows the mode you will switch to.
+        // Theme toggle: shows the mode you will switch to. Tab-reachable
+        // and key-activatable like the rest of the form.
         Rectangle {
             id: themeButton
+
+            activeFocusOnTab: true
+            border.width: activeFocus ? 2 : 0
+            border.color: Theme.tokens.primary
+            Keys.onReturnPressed: Preferences.setTheme(Theme.dark ? "light" : "dark")
+            Keys.onEnterPressed: Preferences.setTheme(Theme.dark ? "light" : "dark")
+            Keys.onSpacePressed: Preferences.setTheme(Theme.dark ? "light" : "dark")
 
             implicitWidth: 28
             implicitHeight: 28
@@ -65,13 +73,24 @@ Rectangle {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onClicked: Preferences.setTheme(Theme.dark ? "light" : "dark")
+                onClicked: {
+                    themeButton.forceActiveFocus();
+                    Preferences.setTheme(Theme.dark ? "light" : "dark");
+                }
             }
         }
 
-        // Close
+        // Close. Esc covers the same action anywhere in the window; this
+        // keeps the button reachable in the tab chain regardless.
         Rectangle {
             id: closeButton
+
+            activeFocusOnTab: true
+            border.width: activeFocus ? 2 : 0
+            border.color: Theme.tokens.primary
+            Keys.onReturnPressed: root.closeRequested()
+            Keys.onEnterPressed: root.closeRequested()
+            Keys.onSpacePressed: root.closeRequested()
 
             implicitWidth: 28
             implicitHeight: 28
@@ -100,7 +119,10 @@ Rectangle {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onClicked: root.closeRequested()
+                onClicked: {
+                    closeButton.forceActiveFocus();
+                    root.closeRequested();
+                }
             }
         }
     }

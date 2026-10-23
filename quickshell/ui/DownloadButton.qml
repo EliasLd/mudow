@@ -3,9 +3,10 @@ import QtQuick
 import QtQuick.Layouts
 import qs.config
 
-// Submit pill: enabled once a URL is present. Pressing it starts the
-// download fire-and-forget style — the window hides immediately and the
-// result arrives as a notification (rofi-parity copies).
+// Submit pill: enabled once a URL is present. Pressing it — by mouse, or
+// with Return/Space once it holds focus — starts the download
+// fire-and-forget style: the window hides immediately and the result
+// arrives as a notification (rofi-parity copies).
 Rectangle {
     id: root
 
@@ -18,6 +19,30 @@ Rectangle {
     color: allowed ? Theme.tokens.primary : Theme.tokens.surfaceAlt
     Behavior on color {
         ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easingCubic }
+    }
+
+    // Tab-reachable and key-activatable; the ring flips color so it stays
+    // visible on both the primary fill (allowed) and the neutral fill.
+    activeFocusOnTab: true
+    border.width: activeFocus ? 2 : 0
+    border.color: allowed ? Theme.tokens.onPrimary : Theme.tokens.primary
+    Behavior on border.color {
+        ColorAnimation {
+            duration: Theme.durationFast
+            easing.type: Theme.easingCubic
+        }
+    }
+    Keys.onReturnPressed: {
+        if (allowed)
+            root.clicked();
+    }
+    Keys.onEnterPressed: {
+        if (allowed)
+            root.clicked();
+    }
+    Keys.onSpacePressed: {
+        if (allowed)
+            root.clicked();
     }
     opacity: allowed ? 1 : 0.4
     Behavior on opacity {
@@ -37,7 +62,10 @@ Rectangle {
         hoverEnabled: true
         enabled: root.allowed
         cursorShape: root.allowed ? Qt.PointingHandCursor : Qt.ArrowCursor
-        onClicked: root.clicked()
+        onClicked: {
+            root.forceActiveFocus();
+            root.clicked();
+        }
     }
 
     Row {

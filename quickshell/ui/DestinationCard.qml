@@ -7,11 +7,13 @@ import qs.config
 
 // DESTINATION group: optional directory override. Empty = use mudow's
 // own default (announced in the placeholder). The last non-empty value is
-// remembered on submit in Preferences.
+// remembered on submit in Preferences. Enter in the field submits, exactly
+// like the source field and the Download button.
 ColumnLayout {
     id: root
 
     property alias text: field.text
+    signal submitted()
 
     opacity: enabled ? 1 : 0.45
     Behavior on opacity {
@@ -56,6 +58,7 @@ ColumnLayout {
             font.pixelSize: Theme.fontSize
             background: Rectangle { color: "transparent" }
             selectByMouse: true
+            onAccepted: root.submitted()
             placeholderText: Paths.defaultDirectory() + "  (default)"
 
             // The state file loads asynchronously, so construction-time

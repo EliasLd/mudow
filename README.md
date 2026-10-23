@@ -1,4 +1,4 @@
-# Rofi YouTube Music Downloader
+# mudow
 
 A simple and modern set of tools to download YouTube videos or playlists as mp3 — from your terminal, with a Rofi menu, or with a quickshell desktop overlay.
 
@@ -8,7 +8,7 @@ A simple and modern set of tools to download YouTube videos or playlists as mp3 
 
 ## Overview
 
-This repository provides two complementary utilities:
+This repository provides three complementary tools:
 
 ### `mudow` (Music Downloader)
 
@@ -29,7 +29,7 @@ Downloads land in `~/Music/<YYYY-MM-DD>-music` by default — a new folder per d
 
 ---
 
-### `rofi-music-dl` (Rofi GUI Music Downloader)
+### The Rofi menu
 
 - **A fully customizable graphical menu built with [Rofi](https://github.com/davatorium/rofi)**, serving as an intuitive interface to `mudow`.
 - Select your URL, destination, and type (video/playlist) directly via shortcut or keybind (perfect for Hyprland/sway/wayland workflows).
@@ -54,7 +54,7 @@ Downloads land in `~/Music/<YYYY-MM-DD>-music` by default — a new folder per d
 ## Why three tools?
 
 - `mudow` is **universal**: works everywhere bash works, no GUI required.
-- `rofi-music-dl` brings the same features in a beautiful, integrated visual menu that's ideal for desktop environments and workflow automation.
+- The Rofi menu brings the same features in a beautiful, integrated visual menu that's ideal for desktop environments and workflow automation.
 - `mudow-gui` is the same flow as a **desktop overlay dialog** — one compact window, dark/light themes, fire-and-forget notifications, zero terminal interaction.
 
 ---
@@ -73,10 +73,10 @@ You can specify `--mudow-only` to install just the CLI, or pick what you want wi
 
 Depending on what options are used, the script will:
 - Install `mudow` globally (`/usr/bin/mudow`)
-- Copy the Rofi menu and its themes to `~/.config/rofi/rofi-music-dl`
-- Copy the quickshell GUI config to `~/.config/quickshell/rofi-music-dl`
+- Copy the Rofi menu and its themes to `~/.config/rofi/mudow`
+- Copy the quickshell GUI config to `~/.config/quickshell/mudow`
 - Install the GUI launcher globally (`/usr/bin/mudow-gui`)
-- Let you launch the Rofi interface with `~/.config/rofi/rofi-music-dl/launch.sh`, or the GUI with `mudow-gui`  
+- Let you launch the Rofi interface with `~/.config/rofi/mudow/launch.sh`, or the GUI with `mudow-gui`  
   (optionally, bind either to a key combo in your WM!)
 
 ---
@@ -105,7 +105,7 @@ pacman -S ttf-jetbrains-mono-nerd
 ## Customization
 
 The menu style and launcher are fully hackable!  
-Change colors, rounding, position, font, etc. in `~/.config/rofi/rofi-music-dl/style.rasi`  
+Change colors, rounding, position, font, etc. in `~/.config/rofi/mudow/style.rasi`  
 Edit `launch.sh` to fit your workflow.
 
-The quickshell GUI is equally hackable: the dark/light palette, typography, shape and motion tokens all live in `~/.config/quickshell/rofi-music-dl/config/Theme.qml`, and each part of the window is a small, editable QML file under `~/.config/quickshell/rofi-music-dl/ui/`.
+The quickshell GUI is equally hackable: the dark/light palette, typography, shape and motion tokens all live in `~/.config/quickshell/mudow/config/Theme.qml`, and each part of the window is a small, editable QML file under `~/.config/quickshell/mudow/ui/`.

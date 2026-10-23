@@ -7,9 +7,9 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
-ROFI_CONFIG_DIR="$HOME/.config/rofi/rofi-music-dl"
+ROFI_CONFIG_DIR="$HOME/.config/rofi/mudow"
 ROFI_SRC_DIR="$REPO_DIR/rofi"
-QUICKSHELL_CONFIG_DIR="$HOME/.config/quickshell/rofi-music-dl"
+QUICKSHELL_CONFIG_DIR="$HOME/.config/quickshell/mudow"
 QUICKSHELL_SRC_DIR="$REPO_DIR/quickshell"
 
 INSTALL_MUDOW=true
@@ -60,7 +60,7 @@ if ! $INSTALL_MUDOW && ! $INSTALL_ROFI && ! $INSTALL_QUICKSHELL; then
 fi
 
 echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}       mudow Music DL Installer        ${NC}"
+echo -e "${BLUE}            mudow Installer            ${NC}"
 echo -e "${BLUE}========================================${NC}\n"
 
 # --- Install a script to /usr/bin (asks before replacing) ---
@@ -97,6 +97,16 @@ copy_config_tree() {
     echo -e "${GREEN}[OK]${NC} Copied config to $dest_dir"
 }
 
+# --- One-time carry-over of state.json from the previous config dir ---
+migrate_state() {
+    local legacy_state="$HOME/.config/quickshell/rofi-music-dl/state.json"
+    local dest_state="$QUICKSHELL_CONFIG_DIR/state.json"
+    if [ ! -f "$dest_state" ] && [ -f "$legacy_state" ]; then
+        cp "$legacy_state" "$dest_state"
+        echo -e "${GREEN}[OK]${NC} Kept state.json from the previous config location"
+    fi
+}
+
 # --- Installation process ---
 STEPS=()
 $INSTALL_MUDOW && STEPS+=(mudow)
@@ -113,7 +123,7 @@ fi
 
 if $INSTALL_ROFI; then
     STEP=$((STEP + 1))
-    echo -e "\n${BLUE}[$STEP/$TOTAL]${NC} Installing Rofi Music DL config..."
+    echo -e "\n${BLUE}[$STEP/$TOTAL]${NC} Installing the Rofi menu config..."
     copy_config_tree "$ROFI_SRC_DIR" "$ROFI_CONFIG_DIR"
 fi
 
@@ -121,6 +131,7 @@ if $INSTALL_QUICKSHELL; then
     STEP=$((STEP + 1))
     echo -e "\n${BLUE}[$STEP/$TOTAL]${NC} Installing quickshell GUI config..."
     copy_config_tree "$QUICKSHELL_SRC_DIR" "$QUICKSHELL_CONFIG_DIR"
+    migrate_state
     install_script "$REPO_DIR/mudow-gui.sh" "/usr/bin/mudow-gui"
 fi
 
@@ -130,22 +141,22 @@ echo -e "${GREEN}========================================${NC}\n"
 echo -e "${YELLOW}Notes :${NC}"
 if $INSTALL_MUDOW && $INSTALL_ROFI && $INSTALL_QUICKSHELL; then
     echo "  - mudow is available as a global command"
-    echo "  - rofi-music-dl configs are under ~/.config/rofi/rofi-music-dl"
-    echo "  - quickshell GUI config is under ~/.config/quickshell/rofi-music-dl"
-    echo "  - launch the rofi menu: ~/.config/rofi/rofi-music-dl/launch.sh"
+    echo "  - the Rofi menu config is under ~/.config/rofi/mudow"
+    echo "  - quickshell GUI config is under ~/.config/quickshell/mudow"
+    echo "  - launch the Rofi menu: ~/.config/rofi/mudow/launch.sh"
     echo "  - launch the GUI: mudow-gui"
     echo "  - you can symlink or set a keybind to either launcher if desired"
 elif $INSTALL_MUDOW && $INSTALL_QUICKSHELL; then
     echo "  - mudow installed globally, GUI available as mudow-gui (no rofi)"
 elif $INSTALL_MUDOW && $INSTALL_ROFI; then
     echo "  - mudow installed globally, no quickshell"
-    echo "  - rofi-music-dl configs are under ~/.config/rofi/rofi-music-dl"
-    echo "  - launch: ~/.config/rofi/rofi-music-dl/launch.sh"
+    echo "  - the Rofi menu config is under ~/.config/rofi/mudow"
+    echo "  - launch: ~/.config/rofi/mudow/launch.sh"
 elif $INSTALL_QUICKSHELL; then
     echo "  - quickshell GUI config installed (no mudow — the GUI needs it!)"
-    echo "  - config is under ~/.config/quickshell/rofi-music-dl; launch with mudow-gui"
+    echo "  - config is under ~/.config/quickshell/mudow; launch with mudow-gui"
 elif $INSTALL_ROFI; then
-    echo "  - only rofi-music-dl config installed, no mudow (why?)"
+    echo "  - only the Rofi menu config installed, no mudow (why?)"
 elif $INSTALL_MUDOW; then
     echo "  - mudow installed globally, no frontends"
 fi

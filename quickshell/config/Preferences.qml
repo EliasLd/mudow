@@ -12,7 +12,7 @@ Singleton {
     FileView {
         id: store
 
-        path: Quickshell.env("HOME") + "/.config/quickshell/rofi-music-dl/state.json"
+        path: Quickshell.env("HOME") + "/.config/quickshell/mudow/state.json"
         watchChanges: true
         atomicWrites: true
         // Absent file is the normal first-run state (defaults apply);
@@ -29,7 +29,7 @@ Singleton {
     // The config directory is installed by install.sh, but the state
     // file's parent might not exist yet on a first dev run.
     Process {
-        command: ["mkdir", "-p", Quickshell.env("HOME") + "/.config/quickshell/rofi-music-dl"]
+        command: ["mkdir", "-p", Quickshell.env("HOME") + "/.config/quickshell/mudow"]
         running: true
     }
 
